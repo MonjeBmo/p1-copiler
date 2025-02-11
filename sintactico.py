@@ -1,15 +1,15 @@
 import ply.yacc as yacc
 from lexico import tokens
 
-# Precedencia de operadores actualizada
+# Precedencia de operadores
 precedence = (
-    ('left', 'LOR'),          # Operador OR lógico
-    ('left', 'LAND'),         # Operador AND lógico
-    ('left', 'LT', 'GT'),     # Comparaciones
+    ('left', 'LOR'),        
+    ('left', 'LAND'),       
+    ('left', 'EQ', 'NE', 'LT', 'GT'),
     ('left', 'PLUS', 'MINUS'),
-    ('left', 'EQ'),
-    ('left', 'NE'),
-    ('left', 'TIMES', 'DIVIDE')
+    ('left', 'TIMES', 'DIVIDE'),
+    ('right', 'LNOT'),  # NOT lógico (!)
+    ('right', 'INCREMENT')  # Incremento (++)
 )
 
 # Reglas de gramática
@@ -34,7 +34,7 @@ def p_statement_declaration(p):
 def p_statement_assignment(p):
     '''statement : ID EQUALS expression SEMICOLON
                  | ID EQUALS STRING_LITERAL SEMICOLON'''
-    p[0] = ('assignment, =', p[1], p[3])
+    p[0] = ('assignment', p[1], p[3])
 
 def p_statement_for(p):
     'statement : FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN statement'
@@ -104,9 +104,15 @@ def p_factor_expr(p):
     'factor : LPAREN expression RPAREN'
     p[0] = p[2]
 
-def p_expression_equals(p):
-    'expression : ID EQUALS expression'
-    p[0] = ('assignment', p[1], p[3])
+# Nuevo: Expresión con NOT lógico (!)
+def p_factor_not(p):
+    'factor : LNOT factor'
+    p[0] = ('not', p[2])
+
+# Nuevo: Expresión con incremento (++)
+def p_factor_increment(p):
+    'factor : ID INCREMENT'
+    p[0] = ('increment', p[1])
 
 def p_expression_list(p):
     'expression : LBRACKET elements RBRACKET'
@@ -125,7 +131,11 @@ def p_elements_empty(p):
     p[0] = []
 
 def p_error(p):
-    print("Error sintáctico en '%s'" % p.value if p else "Error en entrada")
+    if p:
+        print(f"Error sintáctico en '{p.value}' en la línea {p.lineno}")
+    else:
+        print("Error en entrada: fin de archivo inesperado")
 
 # Construir el analizador sintáctico
 parser = yacc.yacc()
+
