@@ -1,5 +1,6 @@
 import ply.lex as lex
 
+# Palabras reservadas
 words_reserved = {
     'if': 'IF',
     'else': 'ELSE',
@@ -10,22 +11,16 @@ words_reserved = {
     'string': 'STRING'
 }
 
-# Lista de tokens añadiendo LOR y LAND
+# Lista de tokens
 tokens = [
-    'ID',
-    'NUMBER',
-    'STRING_LITERAL',
-    'LPAREN', 'RPAREN',
-    'PLUS', 'MINUS', 'DIVIDE', 'TIMES',
-    'LBRACE', 'RBRACE',
-    'LBRACKET', 'RBRACKET',
-    'EQUALS', 'SEMICOLON',
-    'LT', 'GT', 'COMMA',
-    'LOR', 'LAND',  # Añadidos los nuevos tokens
-    'EQ', 'NE'
+    'ID', 'NUMBER', 'STRING_LITERAL',
+    'LPAREN', 'RPAREN', 'PLUS', 'MINUS', 'DIVIDE', 'TIMES',
+    'LBRACE', 'RBRACE', 'LBRACKET', 'RBRACKET', 'EQUALS', 'SEMICOLON',
+    'LT', 'GT', 'COMMA', 'LOR', 'LAND', 'EQ', 'NE',
+    'LNOT', 'INCREMENT'  # Nuevos tokens
 ] + list(words_reserved.values())
 
-# Reglas para los tokens
+# Expresiones regulares para tokens simples
 t_PLUS = r'\+'
 t_MINUS = r'-'
 t_TIMES = r'\*'
@@ -41,11 +36,12 @@ t_SEMICOLON = r';'
 t_LT = r'<'
 t_GT = r'>'
 t_COMMA = r','
-t_LOR = r'\|\|'  # Nuevo token para OR lógico
-t_LAND = r'&&'   # Nuevo token para AND lógico
+t_LOR = r'\|\|'  
+t_LAND = r'&&'   
 t_EQ = r'=='
 t_NE = r'!='
-
+t_LNOT = r'!'  # Nuevo token para NOT lógico
+t_INCREMENT = r'\+\+'  # Nuevo token para incremento
 
 # Reglas para números
 def t_FLOAT(t):
@@ -71,11 +67,16 @@ def t_ID(t):
     return t
 
 # Ignorar espacios y tabulaciones
-t_ignore = ' \t\n'
+t_ignore = ' \t'
+
+# Manejo de saltos de línea
+def t_newline(t):
+    r'\n+'
+    t.lexer.lineno += len(t.value)
 
 # Manejo de errores
 def t_error(t):
-    print(f"Carácter ilegal: {t.value[0]} en la posición {t.lexpos}")
+    print(f"Carácter ilegal: {t.value[0]} en la línea {t.lineno}, posición {t.lexpos}")
     t.lexer.skip(1)
 
 # Construir el analizador léxico
