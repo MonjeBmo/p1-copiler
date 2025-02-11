@@ -10,7 +10,7 @@ words_reserved = {
     'string': 'STRING'
 }
 
-# Lista de tokens añadiendo LOR y LAND
+# Lista de tokens
 tokens = [
     'ID',
     'NUMBER',
@@ -20,8 +20,7 @@ tokens = [
     'LBRACE', 'RBRACE',
     'LBRACKET', 'RBRACKET',
     'EQUALS', 'SEMICOLON',
-    'LT', 'GT', 'COMMA',
-    'LOR', 'LAND'  # Añadidos los nuevos tokens
+    'LT', 'GT', 'COMMA'
 ] + list(words_reserved.values())
 
 # Reglas para los tokens
@@ -40,8 +39,6 @@ t_SEMICOLON = r';'
 t_LT = r'<'
 t_GT = r'>'
 t_COMMA = r','
-t_LOR = r'\|\|'  # Nuevo token para OR lógico
-t_LAND = r'&&'   # Nuevo token para AND lógico
 
 # Reglas para números
 def t_FLOAT(t):
@@ -54,16 +51,16 @@ def t_NUMBER(t):
     t.value = int(t.value)
     return t
 
-# Regla para strings
+# Regla para strings (cadenas de texto)
 def t_STRING_LITERAL(t):
     r'\"([^\\\n]|(\\.))*?\"'
-    t.value = t.value[1:-1]
+    t.value = t.value[1:-1]  # Elimina las comillas del string
     return t
 
 # Regla para identificadores y palabras reservadas
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
-    t.type = words_reserved.get(t.value, 'ID')
+    t.type = words_reserved.get(t.value, 'ID')  # Palabras reservadas
     return t
 
 # Ignorar espacios y tabulaciones
