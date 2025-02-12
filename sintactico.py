@@ -1,14 +1,13 @@
 import ply.yacc as yacc
 from lexico import tokens
 
-# Precedencia de operadores actualizada
+# Precedencia de operadores
 precedence = (
-    ('left', 'LOR'),          # Operador OR lógico
-    ('left', 'LAND'),         # Operador AND lógico
-    ('left', 'LT', 'GT'),     # Comparaciones
+    ('left', 'LOR'),          # OR lógico
+    ('left', 'LAND'),         # AND lógico
+    ('left', 'LT', 'GT', 'LE', 'GE'),  # Comparaciones
     ('left', 'PLUS', 'MINUS'),
-    ('left', 'EQ'),
-    ('left', 'NE'),
+    ('left', 'EQ', 'NE'),
     ('left', 'TIMES', 'DIVIDE')
 )
 
@@ -20,10 +19,7 @@ def p_program(p):
 def p_statements(p):
     '''statements : statements statement
                   | statement'''
-    if len(p) == 3:
-        p[0] = p[1] + [p[2]]
-    else:
-        p[0] = [p[1]]
+    p[0] = p[1] + [p[2]] if len(p) == 3 else [p[1]]
 
 def p_statement_declaration(p):
     '''statement : INT ID SEMICOLON
@@ -34,7 +30,7 @@ def p_statement_declaration(p):
 def p_statement_assignment(p):
     '''statement : ID EQUALS expression SEMICOLON
                  | ID EQUALS STRING_LITERAL SEMICOLON'''
-    p[0] = ('assignment, =', p[1], p[3])
+    p[0] = ('assignment', p[1], p[3])
 
 def p_statement_for(p):
     'statement : FOR LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN statement'
@@ -51,10 +47,7 @@ def p_statement_block(p):
 def p_statement_if(p):
     '''statement : IF LPAREN expression RPAREN statement
                  | IF LPAREN expression RPAREN statement ELSE statement'''
-    if len(p) == 6:
-        p[0] = ('if', p[3], p[5])
-    else:
-        p[0] = ('if-else', p[3], p[5], p[7])
+    p[0] = ('if', p[3], p[5]) if len(p) == 6 else ('if-else', p[3], p[5], p[7])
 
 def p_statement_expression(p):
     'statement : expression SEMICOLON'
@@ -71,7 +64,9 @@ def p_expression_binop(p):
 
 def p_expression_comparison(p):
     '''expression : expression LT expression
-                  | expression GT expression'''
+                  | expression GT expression
+                  | expression LE expression
+                  | expression GE expression'''
     p[0] = ('comparison', p[2], p[1], p[3])
 
 def p_expression_term(p):

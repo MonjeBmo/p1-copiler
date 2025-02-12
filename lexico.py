@@ -1,5 +1,6 @@
 import ply.lex as lex
 
+# Palabras reservadas
 words_reserved = {
     'if': 'IF',
     'else': 'ELSE',
@@ -10,19 +11,13 @@ words_reserved = {
     'string': 'STRING'
 }
 
-# Lista de tokens añadiendo LOR y LAND
+# Lista de tokens, incluyendo operadores lógicos y relacionales
 tokens = [
-    'ID',
-    'NUMBER',
-    'STRING_LITERAL',
-    'LPAREN', 'RPAREN',
-    'PLUS', 'MINUS', 'DIVIDE', 'TIMES',
-    'LBRACE', 'RBRACE',
-    'LBRACKET', 'RBRACKET',
-    'EQUALS', 'SEMICOLON',
-    'LT', 'GT', 'COMMA',
-    'LOR', 'LAND',  # Añadidos los nuevos tokens
-    'EQ', 'NE'
+    'ID', 'NUMBER', 'STRING_LITERAL',
+    'LPAREN', 'RPAREN', 'PLUS', 'MINUS', 'DIVIDE', 'TIMES',
+    'LBRACE', 'RBRACE', 'LBRACKET', 'RBRACKET',
+    'EQUALS', 'SEMICOLON', 'LT', 'GT', 'LE', 'GE', 'COMMA',
+    'LOR', 'LAND', 'EQ', 'NE'
 ] + list(words_reserved.values())
 
 # Reglas para los tokens
@@ -40,12 +35,13 @@ t_EQUALS = r'='
 t_SEMICOLON = r';'
 t_LT = r'<'
 t_GT = r'>'
+t_LE = r'<='   # Nuevo operador menor o igual
+t_GE = r'>='   # Nuevo operador mayor o igual
 t_COMMA = r','
-t_LOR = r'\|\|'  # Nuevo token para OR lógico
-t_LAND = r'&&'   # Nuevo token para AND lógico
+t_LOR = r'\|\|'  # OR lógico
+t_LAND = r'&&'   # AND lógico
 t_EQ = r'=='
 t_NE = r'!='
-
 
 # Reglas para números
 def t_FLOAT(t):
